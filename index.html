@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>投射呪法訓練場</title>
+  <meta name="description" content="投射呪法の3秒予約→1秒実行サイクルを再現するランゲーム" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div id="app">
+    <canvas id="gameCanvas"></canvas>
+    <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
+
+    <!-- カメラプレビュー -->
+    <div id="cameraPreview">
+      <video id="previewVideo" autoplay playsinline muted></video>
+      <canvas id="skeletonCanvas"></canvas>
+      <div id="cameraDot"></div>
+    </div>
+
+    <!-- 設定パネル -->
+    <div id="settingsPanel">
+      <h1 class="game-title">投射呪法訓練場</h1>
+      <div class="settings-group">
+        <label>レーン数</label>
+        <div class="btn-group">
+          <button class="btn-option" data-setting="lanes" data-value="2">2レーン</button>
+          <button class="btn-option active" data-setting="lanes" data-value="3">3レーン</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>予約時間</label>
+        <div class="btn-group">
+          <button class="btn-option active" data-setting="reserveTime" data-value="3">3秒</button>
+          <button class="btn-option" data-setting="reserveTime" data-value="5">5秒</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>カメラ入力</label>
+        <div class="btn-group">
+          <button class="btn-option" data-setting="camera" data-value="on">有効</button>
+          <button class="btn-option active" data-setting="camera" data-value="off">無効（キーボード）</button>
+        </div>
+      </div>
+
+      <!-- 操作方法 -->
+      <div class="settings-group controls-guide">
+        <label>操作方法</label>
+        <div class="controls-section">
+          <p class="controls-subtitle">▸ キーボード</p>
+          <p class="controls-item">← → レーン移動</p>
+          <p class="controls-item">↑ / Space 跳躍</p>
+          <p class="controls-item">↓ 伏身</p>
+        </div>
+        <div class="controls-section">
+          <p class="controls-subtitle">▸ カメラ</p>
+          <p class="controls-item">体を左右に動かす → レーン移動</p>
+          <p class="controls-item">膝を腰より上に上げる → 跳躍</p>
+          <p class="controls-item">膝を上げる＋手を足より下に → 伏身</p>
+        </div>
+      </div>
+
+      <button id="startBtn" class="btn-start">開始</button>
+      <p class="hint">予約フェーズで行動を入力 → 発動フェーズで自動実行</p>
+    </div>
+
+    <!-- ゲームオーバー -->
+    <div id="gameOverPanel" style="display:none;">
+      <h2 class="gameover-title">終幕</h2>
+      <p class="gameover-score">距離: <span id="finalScore">0</span> m</p>
+      <p class="gameover-best">最高記録: <span id="bestScore">0</span> m</p>
+      <button id="restartBtn" class="btn-start">再開</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
