@@ -66,6 +66,8 @@ export class InputManager {
             this._currentLane = this.cameraToLane(this.cameraInput.inputX);
             if (this.keysDown.has('ArrowUp') || this.keysDown.has(' ')) {
                 rawAction = 'jump';
+            } else if (this.keysDown.has('Shift')) {
+                rawAction = 'pushup';
             } else if (this.keysDown.has('ArrowDown')) {
                 rawAction = 'crouch';
             } else {
@@ -75,6 +77,8 @@ export class InputManager {
             this._currentLane = this.keyboardLane;
             if (this.keysDown.has('ArrowUp') || this.keysDown.has(' ')) {
                 rawAction = 'jump';
+            } else if (this.keysDown.has('Shift')) {
+                rawAction = 'pushup';
             } else if (this.keysDown.has('ArrowDown')) {
                 rawAction = 'crouch';
             } else {
@@ -82,10 +86,13 @@ export class InputManager {
             }
         }
 
-        // アクションホールド処理: ジャンプ/しゃがみ入力で1秒間継続
-        if (rawAction === 'jump' || rawAction === 'crouch') {
-            this.actionHoldTimer = this.actionHoldDuration;
-            this.actionHoldType = rawAction;
+        // アクションホールド処理: ジャンプ/しゃがみ/腕立て入力で1秒間継続
+        if (rawAction === 'jump' || rawAction === 'crouch' || rawAction === 'pushup') {
+            // pushupは既存のcrouchホールドを上書き
+            if (rawAction === 'pushup' || this.actionHoldType !== 'pushup') {
+                this.actionHoldTimer = this.actionHoldDuration;
+                this.actionHoldType = rawAction;
+            }
         }
 
         if (this.actionHoldTimer > 0) {

@@ -36,6 +36,25 @@ export function setupUI(
         });
     });
 
+    // 操作方法モーダル
+    const controlsBtn = document.getElementById('controlsBtn')!;
+    const controlsModal = document.getElementById('controlsModal')!;
+    const closeControlsBtn = document.getElementById('closeControlsBtn')!;
+
+    controlsBtn.addEventListener('click', () => {
+        controlsModal.style.display = '';
+    });
+
+    closeControlsBtn.addEventListener('click', () => {
+        controlsModal.style.display = 'none';
+    });
+
+    controlsModal.addEventListener('click', (e) => {
+        if (e.target === controlsModal) {
+            controlsModal.style.display = 'none';
+        }
+    });
+
     startBtn.addEventListener('click', () => {
         settingsPanel.style.display = 'none';
         onStart();
@@ -44,6 +63,12 @@ export function setupUI(
     restartBtn.addEventListener('click', () => {
         gameOverPanel.style.display = 'none';
         onRestart();
+    });
+
+    const menuBtn = document.getElementById('menuBtn')!;
+    menuBtn.addEventListener('click', () => {
+        gameOverPanel.style.display = 'none';
+        settingsPanel.style.display = '';
     });
 }
 

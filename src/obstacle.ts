@@ -2,7 +2,7 @@
 import { settings } from './settings';
 import { PlayerAction } from './player';
 
-export type ObstacleType = 'normal' | 'ground' | 'overhead';
+export type ObstacleType = 'normal' | 'ground' | 'overhead' | 'crawl';
 
 export interface Obstacle {
     lane: number;
@@ -15,51 +15,65 @@ export interface Obstacle {
 
 export class ObstacleManager {
     obstacles: Obstacle[] = [];
-    private spawnTimer = 0;
-    private baseInterval = 0.37;   // 密度1.5倍
-    private minInterval = 0.13;
+    private lastSpawnY = -80;
+    private baseInterval = 0.37;   // 密度設定 (初期時間間隔)
+    private minInterval = 0.13;    // 最小時間間隔
 
     update(dt: number, speed: number, roadLeft: number, laneWidth: number, elapsedTotal: number) {
-        this.spawnTimer -= dt;
-
-        if (this.spawnTimer <= 0) {
-            this.spawn(laneWidth, elapsedTotal);
-            const interval = Math.max(this.minInterval, this.baseInterval - elapsedTotal * 0.008);
-            this.spawnTimer = interval;
-        }
-
+        // 既存の障害物を移動
         for (const obs of this.obstacles) {
             obs.y += speed * dt;
+        }
+
+        // 最終生成位置も移動（画面に対して手前に来る）
+        this.lastSpawnY += speed * dt;
+
+        // 先読み生成: 現在位置から3000px先まで埋める
+        // 画面上端(0)より先はマイナス座標
+        const lookAheadDistance = 3000;
+        const generationLimit = -lookAheadDistance;
+
+        while (this.lastSpawnY > generationLimit) {
+            // 次の生成位置を決定
+            // 時間ベースの間隔ロジックを距離に変換
+            const intervalTime = Math.max(this.minInterval, this.baseInterval - elapsedTotal * 0.008);
+            const intervalDist = speed * intervalTime;
+
+            // 奥（マイナス方向）へ移動して配置
+            this.lastSpawnY -= intervalDist;
+            this.spawn(laneWidth, elapsedTotal, this.lastSpawnY);
         }
 
         this.obstacles = this.obstacles.filter(o => o.y < 2000);
     }
 
-    private spawn(laneWidth: number, elapsedTotal: number) {
+    private spawn(laneWidth: number, elapsedTotal: number, startY: number) {
         const laneCount = settings.laneCount;
 
         // 障害物タイプを選択（ゲーム開始5秒後からground/overhead出現）
         let type: ObstacleType = 'normal';
         if (elapsedTotal > 5) {
             const roll = Math.random();
-            if (roll < 0.30) {
+            if (elapsedTotal > 10 && roll < 0.15) {
+                type = 'crawl';
+            } else if (roll < 0.35) {
                 type = 'ground';
             } else if (roll < 0.60) {
                 type = 'overhead';
             }
         }
 
-        if (type === 'ground' || type === 'overhead') {
-            // ジャンプ/しゃがみ障害物: 全レーンに配置可能
+        if (type === 'ground' || type === 'overhead' || type === 'crawl') {
+            // ジャンプ/しゃがみ/腕立て障害物: 全レーンに配置可能
             // 70%の確率で全レーン、30%で一部レーン
-            const allLanes = Math.random() < 0.7;
+            const allLanes = type === 'crawl' ? true : Math.random() < 0.7;
             if (allLanes) {
                 for (let i = 0; i < laneCount; i++) {
                     this.obstacles.push({
                         lane: i,
-                        y: -80,
+                        y: startY,
                         width: laneWidth * 0.7,
-                        height: type === 'ground' ? 30 : 35,
+                        height: type === 'ground' ? 30 : type === 'crawl' ? 25 : 35,
                         passed: false,
                         type,
                     });
@@ -71,7 +85,7 @@ export class ObstacleManager {
                     const idx = Math.floor(Math.random() * available.length);
                     this.obstacles.push({
                         lane: available[idx],
-                        y: -80,
+                        y: startY,
                         width: laneWidth * 0.7,
                         height: type === 'ground' ? 30 : 35,
                         passed: false,
@@ -97,7 +111,7 @@ export class ObstacleManager {
             for (const lane of lanes) {
                 this.obstacles.push({
                     lane,
-                    y: -80,
+                    y: startY,
                     width: laneWidth * 0.6,
                     height: 50,
                     passed: false,
@@ -127,6 +141,9 @@ export class ObstacleManager {
             if (obs.type === 'overhead' && playerAction === 'crouch') {
                 continue;
             }
+            if (obs.type === 'crawl' && playerAction === 'pushup') {
+                continue;
+            }
 
             if (
                 playerRect.x < ox + obs.width &&
@@ -142,6 +159,6 @@ export class ObstacleManager {
 
     reset() {
         this.obstacles = [];
-        this.spawnTimer = 0;
+        this.lastSpawnY = -80;
     }
 }

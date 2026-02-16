@@ -7,8 +7,8 @@
 }
 
 body {
-  background: #0f0b14;
-  color: #e8dcc8;
+  background: #1e4a48;
+  color: #e8efe8;
   font-family: 'Shippori Mincho', serif;
   overflow: hidden;
   width: 100vw;
@@ -25,22 +25,23 @@ body {
   display: block;
   width: 100vw;
   height: 100vh;
-  background: #0f0b14;
+  background: #2d5a55;
 }
 
-/* カメラプレビュー */
+/* カメラプレビュー - 左下小窓 */
 #cameraPreview {
   display: none;
   position: absolute;
-  bottom: 16px;
-  left: 16px;
-  width: 280px;
-  height: 210px;
-  border-radius: 6px;
+  bottom: 12px;
+  left: 12px;
+  width: 300px;
+  height: 225px;
   overflow: hidden;
-  border: 2px solid rgba(196, 164, 106, 0.5);
-  box-shadow: 0 0 20px rgba(196, 164, 106, 0.15);
+  border: 2px solid rgba(196, 164, 106, 0.4);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   z-index: 50;
+  background: #0a0812;
 }
 
 #cameraPreview video {
@@ -74,7 +75,7 @@ body {
   pointer-events: none;
 }
 
-/* 設定パネル - 巻物風 */
+/* 設定パネル - 木製橋風 */
 #settingsPanel {
   position: absolute;
   top: 50%;
@@ -82,29 +83,29 @@ body {
   transform: translate(-50%, -50%);
   background:
     linear-gradient(to bottom,
-      rgba(42, 30, 20, 0.97) 0%,
-      rgba(35, 25, 18, 0.95) 4%,
-      rgba(30, 22, 16, 0.93) 8%,
-      rgba(28, 20, 14, 0.92) 92%,
-      rgba(35, 25, 18, 0.95) 96%,
-      rgba(42, 30, 20, 0.97) 100%);
+      rgba(90, 55, 30, 0.96) 0%,
+      rgba(75, 45, 25, 0.94) 4%,
+      rgba(65, 38, 20, 0.93) 8%,
+      rgba(60, 35, 18, 0.92) 92%,
+      rgba(75, 45, 25, 0.94) 96%,
+      rgba(90, 55, 30, 0.96) 100%);
   backdrop-filter: blur(16px);
-  border: 2px solid rgba(196, 164, 106, 0.3);
-  border-top: 4px solid rgba(139, 90, 43, 0.6);
-  border-bottom: 4px solid rgba(139, 90, 43, 0.6);
-  border-radius: 4px;
-  padding: 44px 36px;
-  min-width: 340px;
-  max-width: 420px;
+  border: 2px solid rgba(140, 100, 60, 0.4);
+  border-top: 4px solid rgba(120, 80, 40, 0.7);
+  border-bottom: 4px solid rgba(120, 80, 40, 0.7);
+  border-radius: 6px;
+  padding: clamp(16px, 4vh, 44px) clamp(16px, 3vw, 36px);
+  width: clamp(280px, 50vw, 420px);
+  max-height: 90vh;
   z-index: 100;
   box-shadow:
-    0 0 60px rgba(196, 164, 106, 0.08),
+    0 0 60px rgba(60, 120, 110, 0.12),
     0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 0 80px rgba(196, 164, 106, 0.03);
+    inset 0 0 80px rgba(140, 100, 60, 0.05);
   animation: scrollAppear 0.6s ease-out;
 }
 
-/* 巻物の上下ロール装飾 */
+/* 橋の上下装飾 */
 #settingsPanel::before,
 #settingsPanel::after {
   content: '';
@@ -112,9 +113,9 @@ body {
   height: 3px;
   background: linear-gradient(to right,
       transparent 0%,
-      rgba(196, 164, 106, 0.25) 20%,
-      rgba(196, 164, 106, 0.4) 50%,
-      rgba(196, 164, 106, 0.25) 80%,
+      rgba(140, 100, 60, 0.3) 20%,
+      rgba(160, 120, 70, 0.5) 50%,
+      rgba(140, 100, 60, 0.3) 80%,
       transparent 100%);
   margin: 0 -12px;
 }
@@ -142,23 +143,23 @@ body {
 .game-title {
   font-family: 'Shippori Mincho', serif;
   font-weight: 800;
-  font-size: 26px;
+  font-size: clamp(18px, 3.5vmin, 26px);
   text-align: center;
-  margin-bottom: 32px;
-  color: #c4a46a;
+  margin-bottom: clamp(12px, 3vh, 32px);
+  color: #e8dcc8;
   text-shadow:
-    0 0 20px rgba(196, 164, 106, 0.3),
-    0 0 40px rgba(196, 164, 106, 0.1);
-  letter-spacing: 6px;
+    0 0 20px rgba(200, 160, 100, 0.4),
+    0 0 40px rgba(200, 160, 100, 0.15);
+  letter-spacing: clamp(2px, 1vw, 6px);
 }
 
 .settings-group {
-  margin-bottom: 20px;
+  margin-bottom: clamp(8px, 2vh, 20px);
 }
 
 /* 操作方法ガイド */
 .controls-guide {
-  border-top: 1px solid rgba(196, 164, 106, 0.15);
+  border-top: 1px solid rgba(140, 100, 60, 0.2);
   padding-top: 16px;
 }
 
@@ -169,14 +170,14 @@ body {
 .controls-subtitle {
   font-size: 12px;
   font-weight: 700;
-  color: rgba(196, 164, 106, 0.7);
+  color: rgba(200, 170, 120, 0.8);
   margin-bottom: 4px;
   letter-spacing: 1px;
 }
 
 .controls-item {
   font-size: 12px;
-  color: rgba(200, 180, 150, 0.6);
+  color: rgba(220, 200, 170, 0.65);
   padding-left: 16px;
   line-height: 1.8;
 }
@@ -184,10 +185,10 @@ body {
 .settings-group label {
   display: block;
   font-family: 'Shippori Mincho', serif;
-  font-size: 13px;
+  font-size: clamp(11px, 1.8vmin, 13px);
   font-weight: 700;
-  color: rgba(196, 164, 106, 0.6);
-  margin-bottom: 8px;
+  color: rgba(200, 170, 120, 0.7);
+  margin-bottom: clamp(4px, 1vh, 8px);
   letter-spacing: 2px;
 }
 
@@ -198,12 +199,12 @@ body {
 
 .btn-option {
   flex: 1;
-  padding: 10px 12px;
-  background: rgba(50, 35, 25, 0.7);
-  border: 1px solid rgba(196, 164, 106, 0.15);
+  padding: clamp(6px, 1.2vh, 10px) clamp(8px, 1.5vw, 12px);
+  background: rgba(40, 70, 65, 0.6);
+  border: 1px solid rgba(100, 160, 140, 0.2);
   border-radius: 4px;
-  color: rgba(200, 180, 150, 0.6);
-  font-size: 14px;
+  color: rgba(180, 210, 200, 0.7);
+  font-size: clamp(11px, 2vmin, 14px);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -211,44 +212,44 @@ body {
 }
 
 .btn-option:hover {
-  background: rgba(70, 50, 35, 0.7);
-  border-color: rgba(196, 164, 106, 0.3);
+  background: rgba(50, 85, 78, 0.7);
+  border-color: rgba(100, 170, 150, 0.35);
 }
 
 .btn-option.active {
-  background: rgba(160, 50, 40, 0.2);
-  border-color: rgba(183, 65, 50, 0.5);
-  color: #d4836a;
-  box-shadow: 0 0 16px rgba(183, 65, 50, 0.1);
+  background: rgba(40, 100, 90, 0.4);
+  border-color: rgba(80, 180, 150, 0.5);
+  color: #7ad4c0;
+  box-shadow: 0 0 16px rgba(80, 180, 150, 0.15);
 }
 
 .btn-start {
   display: block;
   width: 100%;
-  margin-top: 28px;
-  padding: 16px;
-  background: linear-gradient(135deg, #8b3a2f, #6b2a1f);
-  border: 2px solid rgba(196, 164, 106, 0.3);
+  margin-top: clamp(12px, 2.5vh, 28px);
+  padding: clamp(10px, 2vh, 16px);
+  background: linear-gradient(135deg, #3a7a6a, #2a6050);
+  border: 2px solid rgba(100, 180, 150, 0.35);
   border-radius: 4px;
-  color: #e8dcc8;
+  color: #e8f0ec;
   font-family: 'Shippori Mincho', serif;
-  font-size: 20px;
+  font-size: clamp(16px, 2.5vmin, 20px);
   font-weight: 800;
-  letter-spacing: 8px;
+  letter-spacing: clamp(4px, 1vw, 8px);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow:
-    0 4px 16px rgba(139, 58, 47, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    0 4px 16px rgba(50, 120, 100, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .btn-start:hover {
-  background: linear-gradient(135deg, #a04535, #7b3525);
+  background: linear-gradient(135deg, #4a8a78, #358a6a);
   transform: translateY(-1px);
   box-shadow:
-    0 6px 24px rgba(139, 58, 47, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 6px 24px rgba(50, 140, 110, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-start:active {
@@ -257,13 +258,13 @@ body {
 
 .hint {
   text-align: center;
-  margin-top: 16px;
-  font-size: 12px;
-  color: rgba(196, 164, 106, 0.35);
+  margin-top: clamp(6px, 1.5vh, 16px);
+  font-size: clamp(10px, 1.6vmin, 12px);
+  color: rgba(180, 210, 200, 0.4);
   font-family: 'Shippori Mincho', serif;
 }
 
-/* ゲームオーバー - 墨風 */
+/* ゲームオーバー - 湖面風 */
 #gameOverPanel {
   position: absolute;
   top: 50%;
@@ -271,52 +272,210 @@ body {
   transform: translate(-50%, -50%);
   background:
     linear-gradient(to bottom,
-      rgba(20, 12, 8, 0.97),
-      rgba(15, 10, 6, 0.95));
+      rgba(30, 60, 55, 0.97),
+      rgba(20, 50, 45, 0.95));
   backdrop-filter: blur(24px);
-  border: 2px solid rgba(183, 65, 50, 0.3);
-  border-top: 4px solid rgba(139, 90, 43, 0.5);
-  border-bottom: 4px solid rgba(139, 90, 43, 0.5);
-  border-radius: 4px;
-  padding: 48px 40px;
-  min-width: 320px;
+  border: 2px solid rgba(80, 160, 140, 0.3);
+  border-top: 4px solid rgba(120, 80, 40, 0.5);
+  border-bottom: 4px solid rgba(120, 80, 40, 0.5);
+  border-radius: 6px;
+  padding: clamp(24px, 5vh, 48px) clamp(20px, 4vw, 40px);
+  width: clamp(260px, 45vw, 380px);
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   z-index: 100;
-  box-shadow: 0 0 80px rgba(183, 65, 50, 0.1);
+  box-shadow: 0 0 80px rgba(60, 140, 120, 0.12);
   animation: scrollAppear 0.6s ease-out;
 }
 
 .gameover-title {
   font-family: 'Shippori Mincho', serif;
   font-weight: 800;
-  font-size: 36px;
-  color: #b74132;
-  margin-bottom: 24px;
-  letter-spacing: 8px;
-  text-shadow: 0 0 30px rgba(183, 65, 50, 0.3);
+  font-size: clamp(24px, 5vmin, 36px);
+  color: #e8dcc8;
+  margin-bottom: clamp(12px, 3vh, 24px);
+  letter-spacing: clamp(4px, 1vw, 8px);
+  text-shadow: 0 0 30px rgba(200, 160, 100, 0.3);
 }
 
 .gameover-score {
   font-family: 'Shippori Mincho', serif;
-  font-size: 24px;
+  font-size: clamp(18px, 3vmin, 24px);
   font-weight: 700;
-  color: #e8dcc8;
+  color: #e8f0ec;
   margin-bottom: 8px;
 }
 
 .gameover-score span {
-  color: #c4a46a;
+  color: #7ad4c0;
   font-family: 'Shippori Mincho', serif;
 }
 
 .gameover-best {
   font-family: 'Shippori Mincho', serif;
   font-size: 16px;
-  color: rgba(200, 180, 150, 0.5);
+  color: rgba(180, 210, 200, 0.55);
   margin-bottom: 8px;
 }
 
 .gameover-best span {
-  color: rgba(196, 164, 106, 0.7);
+  color: rgba(120, 200, 180, 0.7);
   font-family: 'Shippori Mincho', serif;
+}
+
+.btn-menu {
+  display: block;
+  width: 100%;
+  margin-top: clamp(6px, 1vh, 12px);
+  padding: clamp(8px, 1.5vh, 12px);
+  background: rgba(40, 70, 65, 0.6);
+  border: 1px solid rgba(100, 160, 140, 0.25);
+  border-radius: 4px;
+  color: rgba(180, 210, 200, 0.7);
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(12px, 2vmin, 15px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-menu:hover {
+  background: rgba(50, 85, 78, 0.7);
+  border-color: rgba(100, 180, 150, 0.4);
+  color: #7ad4c0;
+}
+
+/* 操作方法ボタン */
+.btn-controls {
+  display: block;
+  width: 100%;
+  margin-top: clamp(8px, 1.5vh, 16px);
+  padding: clamp(8px, 1.5vh, 12px);
+  background: rgba(40, 70, 65, 0.6);
+  border: 1px solid rgba(100, 160, 140, 0.25);
+  border-radius: 4px;
+  color: rgba(180, 210, 200, 0.7);
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(12px, 2vmin, 15px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-controls:hover {
+  background: rgba(50, 85, 78, 0.7);
+  border-color: rgba(100, 180, 150, 0.4);
+  color: #7ad4c0;
+}
+
+/* モーダルオーバーレイ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 30, 28, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background:
+    linear-gradient(to bottom,
+      rgba(65, 40, 22, 0.97) 0%,
+      rgba(55, 32, 18, 0.95) 50%,
+      rgba(65, 40, 22, 0.97) 100%);
+  border: 2px solid rgba(140, 100, 60, 0.35);
+  border-top: 4px solid rgba(120, 80, 40, 0.6);
+  border-bottom: 4px solid rgba(120, 80, 40, 0.6);
+  border-radius: 6px;
+  padding: clamp(20px, 4vh, 40px) clamp(20px, 3vw, 36px);
+  width: clamp(280px, 45vw, 400px);
+  box-shadow:
+    0 0 80px rgba(60, 120, 110, 0.1),
+    0 16px 48px rgba(0, 0, 0, 0.6);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-title {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 800;
+  font-size: clamp(16px, 3vmin, 22px);
+  text-align: center;
+  color: #e8dcc8;
+  margin-bottom: clamp(12px, 2.5vh, 24px);
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(200, 160, 100, 0.3);
+}
+
+.modal-content .controls-section {
+  margin-bottom: 12px;
+}
+
+.modal-content .controls-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(200, 170, 120, 0.8);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.modal-content .controls-item {
+  font-size: 13px;
+  color: rgba(220, 200, 170, 0.65);
+  padding-left: 16px;
+  line-height: 1.9;
+}
+
+.btn-modal-close {
+  display: block;
+  width: 100%;
+  margin-top: clamp(12px, 2vh, 20px);
+  padding: clamp(8px, 1.5vh, 12px);
+  background: rgba(40, 70, 65, 0.6);
+  border: 1px solid rgba(100, 160, 140, 0.25);
+  border-radius: 4px;
+  color: rgba(180, 210, 200, 0.7);
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(12px, 2vmin, 15px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-modal-close:hover {
+  background: rgba(50, 85, 78, 0.7);
+  border-color: rgba(100, 180, 150, 0.4);
+  color: #7ad4c0;
 }

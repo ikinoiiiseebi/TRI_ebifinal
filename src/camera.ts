@@ -165,35 +165,21 @@ export class CameraInput {
         this._inputX = -(centerX - 0.5) * 2;
         this._smoothedX = this._smoothedX * 0.8 + this._inputX * 0.2;
 
-        // --- アクション判定: 膝と手の位置ベース ---
-        if (!leftHip || !rightHip || !leftKnee || !rightKnee) return;
+        // --- アクション判定: 腰のY座標ベース ---
+        if (!leftHip || !rightHip) return;
 
         const hipY = (leftHip.y + rightHip.y) / 2;
-        const kneeY = (leftKnee.y + rightKnee.y) / 2;
 
-        // 膝が腰より上にあるか（画面座標でY値が小さい = 上）
-        const kneeAboveHip = kneeY < hipY - 0.02; // 少し余裕をもたせる
-
-        if (kneeAboveHip) {
-            // 手首と足首の位置で判別
-            const hasWrists = leftWrist && rightWrist;
-            const hasAnkles = leftAnkle && rightAnkle;
-
-            if (hasWrists && hasAnkles) {
-                const wristY = (leftWrist.y + rightWrist.y) / 2;
-                const ankleY = (leftAnkle.y + rightAnkle.y) / 2;
-
-                if (wristY > ankleY) {
-                    // 手先が足先より下 → しゃがみ
-                    this._action = 'crouch';
-                } else {
-                    // 手先が足先より下ではない → ジャンプ
-                    this._action = 'jump';
-                }
-            } else {
-                // ランドマーク不足時はジャンプと仮定
-                this._action = 'jump';
-            }
+        // 腰のY座標で判定（0=画面上端、1=画面下端、0.5が中心目安）
+        if (hipY > 1.0) {
+            // 画面外下 → 腕立て伏せ
+            this._action = 'pushup';
+        } else if (hipY > 0.7) {
+            // 腰が低い → しゃがみ
+            this._action = 'crouch';
+        } else if (hipY < 0.4) {
+            // 腰が高い → ジャンプ
+            this._action = 'jump';
         } else {
             this._action = 'stand';
         }
@@ -289,6 +275,8 @@ export class CameraInput {
                 ctx.fillText('跳', hipCX, hipCY - 18);
             } else if (this._action === 'crouch') {
                 ctx.fillText('伏', hipCX, hipCY - 18);
+            } else if (this._action === 'pushup') {
+                ctx.fillText('腕', hipCX, hipCY - 18);
             }
             ctx.shadowBlur = 0;
         }
@@ -301,6 +289,8 @@ export class CameraInput {
                 return `rgba(106, 159, 212, ${alpha})`;
             case 'crouch':
                 return `rgba(180, 140, 60, ${alpha})`;
+            case 'pushup':
+                return `rgba(220, 120, 50, ${alpha})`;
             default:
                 return `rgba(0, 255, 200, ${alpha})`;
         }

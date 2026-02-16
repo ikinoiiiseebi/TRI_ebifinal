@@ -1,7 +1,7 @@
 // プレイヤー管理
 import { settings } from './settings';
 
-export type PlayerAction = 'stand' | 'jump' | 'crouch';
+export type PlayerAction = 'stand' | 'jump' | 'crouch' | 'pushup';
 
 export interface PositionRecord {
     x: number;       // Canvas上のX座標
@@ -42,11 +42,13 @@ export class Player {
         this.x = this.getLaneX(this.lane, roadLeft, laneWidth);
         this.y = canvasHeight * 0.78;
 
-        // ジャンプ・しゃがみによる表示Y座標の変更
+        // ジャンプ・しゃがみ・腕立てによる表示Y座標の変更
         if (this.action === 'jump') {
             this.displayY = this.y - 30; // 上方向にオフセット
         } else if (this.action === 'crouch') {
             this.displayY = this.y + 10; // 下方向にオフセット
+        } else if (this.action === 'pushup') {
+            this.displayY = this.y + 20; // 地面に近い位置
         } else {
             this.displayY = this.y;
         }
@@ -75,6 +77,14 @@ export class Player {
                 w: this.width,
                 h: this.height * 0.4,
             };
+        } else if (this.action === 'pushup') {
+            // 腕立て伏せ中は非常に低い
+            return {
+                x: this.x - this.width * 0.75,
+                y: this.y + 10,
+                w: this.width * 1.5,
+                h: this.height * 0.2,
+            };
         }
         return {
             x: this.x - this.width / 2,
@@ -88,6 +98,8 @@ export class Player {
     getDisplaySize(): { w: number; h: number } {
         if (this.action === 'crouch') {
             return { w: this.width * 1.2, h: this.height * 0.5 };
+        } else if (this.action === 'pushup') {
+            return { w: this.width * 1.5, h: this.height * 0.3 };
         }
         return { w: this.width, h: this.height };
     }

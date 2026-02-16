@@ -51,25 +51,32 @@
         </div>
       </div>
 
-      <!-- 操作方法 -->
-      <div class="settings-group controls-guide">
-        <label>操作方法</label>
+      <button id="controlsBtn" class="btn-controls">操作方法</button>
+
+      <button id="startBtn" class="btn-start">開始</button>
+      <p class="hint">予約フェーズで行動を入力 → 発動フェーズで自動実行</p>
+    </div>
+
+    <!-- 操作方法モーダル -->
+    <div id="controlsModal" class="modal-overlay" style="display:none;">
+      <div class="modal-content">
+        <h2 class="modal-title">操作方法</h2>
         <div class="controls-section">
           <p class="controls-subtitle">▸ キーボード</p>
           <p class="controls-item">← → レーン移動</p>
           <p class="controls-item">↑ / Space 跳躍</p>
           <p class="controls-item">↓ 伏身</p>
+          <p class="controls-item">Shift 腕立て伏せ</p>
         </div>
         <div class="controls-section">
           <p class="controls-subtitle">▸ カメラ</p>
           <p class="controls-item">体を左右に動かす → レーン移動</p>
-          <p class="controls-item">膝を腰より上に上げる → 跳躍</p>
-          <p class="controls-item">膝を上げる＋手を足より下に → 伏身</p>
+          <p class="controls-item">腰を高く上げる → 跳躍</p>
+          <p class="controls-item">腰を低くする → 伏身</p>
+          <p class="controls-item">腰を画面外下まで下げる → 腕立て伏せ</p>
         </div>
+        <button id="closeControlsBtn" class="btn-modal-close">閉じる</button>
       </div>
-
-      <button id="startBtn" class="btn-start">開始</button>
-      <p class="hint">予約フェーズで行動を入力 → 発動フェーズで自動実行</p>
     </div>
 
     <!-- ゲームオーバー -->
@@ -78,6 +85,7 @@
       <p class="gameover-score">距離: <span id="finalScore">0</span> m</p>
       <p class="gameover-best">最高記録: <span id="bestScore">0</span> m</p>
       <button id="restartBtn" class="btn-start">再開</button>
+      <button id="menuBtn" class="btn-menu">メニューに戻る</button>
     </div>
   </div>
 
