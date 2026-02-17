@@ -21,6 +21,9 @@ const inputManager = new InputManager();
 let game: Game | null = null;
 
 function startGame() {
+    if (game) {
+        game.stop();
+    }
     game = new Game(canvas, inputManager);
     game.start();
 }

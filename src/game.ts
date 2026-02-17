@@ -23,11 +23,12 @@ export class Game {
 
     // スコア・速度
     private score = 0;
-    private baseSpeed = 400;
-    private speed = 400;
+    private baseSpeed = 300; // 初期速度 (少し遅く)
+    private realtimeBaseSpeed = 200; // リアルタイムモード初期速度 (通常の半分)
+    private speed = 300;
     private elapsedTotal = 0;
     private speedIncreaseInterval = 10;
-    private speedIncreaseFactor = 0.05;
+    private speedIncreaseFactor = 0.15; // 加速度 (大きく)
 
     // EXECUTE開始時の速度（到達線計算用）
     private executeStartSpeed = 400;
@@ -50,11 +51,16 @@ export class Game {
         if (saved) this.bestScore = parseFloat(saved);
     }
 
-    start() {
+    stop() {
         if (this.animationFrameId !== null) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
         }
+        this.running = false;
+    }
+
+    start() {
+        this.stop(); // 既存ループ停止
         this.reset();
         this.running = true;
         this.gameOver = false;
@@ -65,8 +71,21 @@ export class Game {
 
     private reset() {
         this.score = 0;
-        this.speed = this.baseSpeed;
         this.elapsedTotal = 0;
+
+        // リアルタイムモードかどうかで初期速度を変える
+        // PhaseManagerの初期状態はREADYだが、その後の遷移先(startPhase)を確認する必要がある
+        // しかしここでは単純に、updateSpeedで補正されることを期待するか、
+        // PhaseManagerに問い合わせる。今の実装ではPhaseManager.start()でモードが決まる。
+        // ここでは一旦baseSpeedにしておき、updateループ内で補正されるように設計するか、
+        // もしくはPhaseManagerの状態を見る。
+        // PhaseManagerはstart()で初期化されるため、reset時点では不明な場合がある。
+        // よって、start()内で phaseManager.start() した後に speed を再設定するのが安全だが、
+        // 簡易的に updateSpeed で毎回計算しているので、初期値は baseSpeed で問題ない。
+        // ただし、リアルタイムモード開始直後の1フレーム目で速度が跳ねないように、
+        // updateSpeed に任せる。
+
+        this.speed = this.baseSpeed;
 
         this.player.reset();
         this.obstacles.reset();
@@ -92,6 +111,7 @@ export class Game {
         if (this.running && !this.gameOver) {
             this.animationFrameId = requestAnimationFrame((t) => this.loop(t));
         }
+        // console.log(this.lastTime); // デバッグログ削除
     }
 
     private update(dt: number) {
@@ -105,7 +125,6 @@ export class Game {
                 break;
 
             case 'RESERVE':
-                // ユーザー入力でレーン選択＋アクション＋記録
                 // ユーザー入力でレーン選択＋アクション＋記録
                 this.player.setLane(this.inputManager.currentLane);
                 this.player.setAction(this.inputManager.currentAction);
@@ -156,8 +175,8 @@ export class Game {
                 this.player.setAction(this.inputManager.currentAction);
 
                 this.elapsedTotal += dt;
-                this.updateSpeed();
-                // リアルタイムモードは速度そのまま
+                this.updateSpeed(); // 速度更新 (加速)
+
                 const realtimeSpeed = this.speed;
                 this.score += realtimeSpeed * dt / 10;
 

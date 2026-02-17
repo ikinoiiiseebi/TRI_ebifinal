@@ -16,8 +16,8 @@ export interface Obstacle {
 export class ObstacleManager {
     obstacles: Obstacle[] = [];
     private lastSpawnY = -80;
-    private baseInterval = 0.37;   // 密度設定 (初期時間間隔)
-    private minInterval = 0.13;    // 最小時間間隔
+    private baseInterval = 0.8;   // 密度設定 (初期時間間隔: 広げた)
+    private minInterval = 0.3;    // 最小時間間隔
 
     update(dt: number, speed: number, roadLeft: number, laneWidth: number, elapsedTotal: number) {
         // 既存の障害物を移動

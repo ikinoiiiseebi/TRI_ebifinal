@@ -311,17 +311,17 @@ export class Renderer {
                 continue;
             }
             // 外側の波紋
-            ctx.strokeStyle = `rgba(140, 230, 210, ${r.opacity * life})`;
+            ctx.strokeStyle = `rgba(140, 230, 210, ${Math.max(0, r.opacity * life)})`;
             ctx.lineWidth = 1.8;
             ctx.beginPath();
-            ctx.ellipse(r.x, r.y, r.radius, r.radius * 0.45, 0, 0, Math.PI * 2);
+            ctx.ellipse(r.x, r.y, Math.max(0, r.radius), Math.max(0, r.radius * 0.45), 0, 0, Math.PI * 2);
             ctx.stroke();
             // 内側の波紋
             if (r.radius > 10) {
-                ctx.strokeStyle = `rgba(160, 240, 220, ${r.opacity * life * 0.5})`;
+                ctx.strokeStyle = `rgba(160, 240, 220, ${Math.max(0, r.opacity * life * 0.5)})`;
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.ellipse(r.x, r.y, r.radius * 0.55, r.radius * 0.25, 0, 0, Math.PI * 2);
+                ctx.ellipse(r.x, r.y, Math.max(0, r.radius * 0.55), Math.max(0, r.radius * 0.25), 0, 0, Math.PI * 2);
                 ctx.stroke();
             }
         }
@@ -334,7 +334,9 @@ export class Renderer {
             const shimAlpha = 0.05 + Math.sin(t * 1.0 + i * 0.6) * 0.04;
             ctx.fillStyle = `rgba(200, 250, 240, ${Math.max(0, shimAlpha)})`;
             ctx.beginPath();
-            ctx.ellipse(shimX, shimY, 25 + Math.sin(t * 0.6 + i) * 15, 5 + Math.sin(t * 0.8 + i) * 2, Math.sin(t * 0.15 + i) * 0.5, 0, Math.PI * 2);
+            const rx = Math.max(0, 25 + Math.sin(t * 0.6 + i) * 15);
+            const ry = Math.max(0, 5 + Math.sin(t * 0.8 + i) * 2);
+            ctx.ellipse(shimX, shimY, rx, ry, Math.sin(t * 0.15 + i) * 0.5, 0, Math.PI * 2);
             ctx.fill();
         }
 
