@@ -36,7 +36,10 @@ export class ObstacleManager {
         while (this.lastSpawnY > generationLimit) {
             // 次の生成位置を決定
             // 時間ベースの間隔ロジックを距離に変換
-            const intervalTime = Math.max(this.minInterval, this.baseInterval - elapsedTotal * 0.008);
+            let intervalTime = Math.max(this.minInterval, this.baseInterval - elapsedTotal * 0.008);
+            if (settings.mode === 'realtime') {
+                intervalTime *= 2;
+            }
             const intervalDist = speed * intervalTime;
 
             // 奥（マイナス方向）へ移動して配置

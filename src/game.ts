@@ -101,6 +101,7 @@ export class Game {
 
             case 'RESERVE':
                 // ユーザー入力でレーン選択＋アクション＋記録
+                // ユーザー入力でレーン選択＋アクション＋記録
                 this.player.setLane(this.inputManager.currentLane);
                 this.player.setAction(this.inputManager.currentAction);
                 this.reservation.record(
@@ -143,6 +144,37 @@ export class Game {
                     return;
                 }
                 break;
+
+            case 'REALTIME':
+                // リアルタイム入力反映
+                this.player.setLane(this.inputManager.currentLane);
+                this.player.setAction(this.inputManager.currentAction);
+
+                this.elapsedTotal += dt;
+                this.updateSpeed();
+                // リアルタイムモードは速度そのまま
+                const realtimeSpeed = this.speed;
+                this.score += realtimeSpeed * dt / 10;
+
+                this.obstacles.update(
+                    dt, realtimeSpeed,
+                    this.renderer.roadLeft, this.renderer.laneWidth,
+                    this.elapsedTotal
+                );
+
+                this.player.updatePosition(
+                    this.renderer.roadLeft, this.renderer.laneWidth,
+                    this.canvas.height, this.elapsedTotal
+                );
+
+                if (this.obstacles.checkCollision(
+                    this.player.getRect(), this.player.action,
+                    this.renderer.roadLeft, this.renderer.laneWidth
+                )) {
+                    this.endGame();
+                    return;
+                }
+                break;
         }
 
         this.player.updatePosition(
@@ -157,7 +189,12 @@ export class Game {
     }
 
     private draw(dt: number) {
-        const renderSpeed = this.phaseManager.phase === 'EXECUTE' ? this.speed * 2 : this.speed;
+        let renderSpeed = this.speed;
+        if (this.phaseManager.phase === 'EXECUTE') {
+            renderSpeed = this.speed * 2;
+        } else if (this.phaseManager.phase === 'REALTIME') {
+            renderSpeed = this.speed;
+        }
         this.renderer.render(
             this.player,
             this.obstacles,

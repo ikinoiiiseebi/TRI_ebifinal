@@ -1,7 +1,7 @@
 // フェーズ管理
 import { settings } from './settings';
 
-export type Phase = 'IDLE' | 'READY' | 'RESERVE' | 'EXECUTE';
+export type Phase = 'IDLE' | 'READY' | 'RESERVE' | 'EXECUTE' | 'REALTIME';
 
 export class PhaseManager {
     phase: Phase = 'IDLE';
@@ -16,7 +16,11 @@ export class PhaseManager {
     }
 
     start() {
-        this.setPhase('READY');
+        if (settings.mode === 'realtime') {
+            this.setPhase('REALTIME');
+        } else {
+            this.setPhase('READY');
+        }
     }
 
     reset() {
@@ -27,7 +31,7 @@ export class PhaseManager {
     }
 
     update(dt: number) {
-        if (this.phase === 'IDLE') return;
+        if (this.phase === 'IDLE' || this.phase === 'REALTIME') return;
 
         this.timer -= dt;
         this.elapsed += dt;
@@ -63,6 +67,9 @@ export class PhaseManager {
                 break;
             case 'EXECUTE':
                 this.duration = 0.5;
+                break;
+            case 'REALTIME':
+                this.duration = 0;
                 break;
 
             default:

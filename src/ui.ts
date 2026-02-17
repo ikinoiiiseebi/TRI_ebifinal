@@ -32,6 +32,8 @@ export function setupUI(
                 const enabled = value === 'on';
                 updateSetting('cameraEnabled', enabled);
                 onCameraToggle(enabled);
+            } else if (settingKey === 'mode') {
+                updateSetting('mode', value as 'normal' | 'realtime');
             }
         });
     });

@@ -18,11 +18,26 @@ export class Renderer {
     private ripples: { x: number; y: number; radius: number; maxRadius: number; opacity: number; speed: number }[] = [];
     private rippleTimer = 0;
 
+    // キャラクターアニメーション用
+    private characterImages: HTMLImageElement[] = [];
+    private currentFrame = 0;
+    private frameTimer = 0;
+    private readonly FRAME_DURATION = 0.1; // 1フレームあたりの秒数
+
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d')!;
         this.calcLayout();
         this.initRipples();
+        this.loadCharacterImages();
+    }
+
+    private loadCharacterImages() {
+        for (let i = 1; i <= 6; i++) {
+            const img = new Image();
+            img.src = `/images/character/chara${i}.png`;
+            this.characterImages.push(img);
+        }
     }
 
     private initRipples() {
@@ -94,7 +109,7 @@ export class Renderer {
             this.drawTravelZone(player, execStartSpeed, execDuration, h, remaining);
         }
 
-        this.drawPlayer(player);
+        this.drawPlayer(player, dt);
         this.drawPhaseHUD(phase, phaseTimer, phaseDuration, h, w);
         this.drawScore(score, w);
         this.drawActionIndicator(player, w);
@@ -479,7 +494,115 @@ export class Renderer {
         }
     }
 
-    private drawPlayer(player: Player) {
+    private drawPlayer(player: Player, dt: number) {
+        const { ctx } = this;
+        const cx = player.x;
+        const cy = player.displayY;
+        const action = player.action;
+
+        // アニメーション更新
+        this.frameTimer += dt;
+        if (this.frameTimer >= this.FRAME_DURATION) {
+            this.frameTimer = 0;
+            this.currentFrame = (this.currentFrame + 1) % this.characterImages.length;
+        }
+
+        const currentImage = this.characterImages[this.currentFrame];
+        // 画像がロードされていない場合は従来の描画にフォールバック、または何もしない
+        if (!currentImage || !currentImage.complete) {
+            this.drawPlayerFallback(player);
+            return;
+        }
+
+        const size = player.width * 2.5; // 画像サイズ調整 (元画像の余白等を考慮して倍率調整)
+
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // 影の描画
+        ctx.save();
+        ctx.scale(1, 0.3);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        // 影の位置調整: ジャンプ時は影を地面に固定するなどの処理が必要だが、
+        // 簡易的にプレイヤーの足元(少し下)に表示
+        // player.y がベース位置(地面)なので、jump時は cy < player.y となる
+        // 影は player.y 相対で描くべきだが、ここでは簡易実装
+        const shadowY = (player.y - cy) / 0.3 + 20;
+        ctx.arc(0, shadowY, size * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // アクションによる変形・回転
+        if (action === 'jump') {
+            // ジャンプ: 少し縦に伸びる？あるいはそのまま
+            // 既存のエフェクト（オーラ）を描画してもよい
+            this.drawJumpEffect(ctx, size / 2.5);
+        } else if (action === 'crouch') {
+            // しゃがみ: 縦に潰す
+            ctx.scale(1.1, 0.7);
+            ctx.translate(0, size * 0.15); // 接地感を維持
+            this.drawCrouchEffect(ctx, size / 2.5);
+        } else if (action === 'pushup') {
+            // 腕立て: さらに低く、あるいは回転させる？
+            // ここでは90度回転させて寝かせてみる（スプライトによるが）
+            // あるいは極端に潰す
+            ctx.scale(1.3, 0.4);
+            ctx.translate(0, size * 0.3);
+            this.drawPushupEffect(ctx, size / 2.5);
+        }
+
+        // 画像描画
+        // 画像の中心を原点に合わせて描画
+        ctx.drawImage(currentImage, -size / 2, -size / 2, size, size);
+
+        // キャプション（跳、伏、腕、呪）の表示
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = `bold 16px 'Shippori Mincho', serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        let caption = '';
+        if (action === 'jump') caption = '跳';
+        else if (action === 'crouch') caption = '伏';
+        else if (action === 'pushup') caption = '腕';
+
+        if (caption) {
+            // 状態文字を頭上に表示
+            ctx.fillText(caption, 0, -size / 2 - 10);
+        }
+
+        ctx.restore();
+    }
+
+    private drawJumpEffect(ctx: CanvasRenderingContext2D, size: number) {
+        // ジャンプエフェクト（簡略化）
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-over'; // 必要に応じて変更
+        ctx.fillStyle = 'rgba(106, 159, 212, 0.2)';
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 1.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    private drawCrouchEffect(ctx: CanvasRenderingContext2D, size: number) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(180, 140, 60, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, size * 1.2, size * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    private drawPushupEffect(ctx: CanvasRenderingContext2D, size: number) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(220, 120, 50, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, size * 1.4, size * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    private drawPlayerFallback(player: Player) {
         const { ctx } = this;
         const cx = player.x;
         const cy = player.displayY;
@@ -868,6 +991,7 @@ export class Renderer {
             RESERVE: { kanji: '予約', color: '#6a9fd4' },
             EXECUTE: { kanji: '発動', color: '#3cc878' },
             AFTERIMAGE: { kanji: '残', color: 'rgba(60, 200, 120, 0.5)' },
+            REALTIME: { kanji: '実戦', color: '#ff4d4d' },
         };
 
         const info = phaseLabels[phase];
@@ -882,6 +1006,11 @@ export class Renderer {
         ctx.shadowColor = info.color;
         ctx.shadowBlur = 20;
         ctx.fillText(info.kanji, w / 2, 16);
+
+        if (phase === 'REALTIME') {
+            ctx.restore();
+            return;
+        }
 
         const remaining = Math.max(0, timer).toFixed(1);
         ctx.font = `700 16px 'Shippori Mincho', serif`;
