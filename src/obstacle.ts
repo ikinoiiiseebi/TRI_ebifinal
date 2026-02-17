@@ -50,11 +50,11 @@ export class ObstacleManager {
     private spawn(laneWidth: number, elapsedTotal: number, startY: number) {
         const laneCount = settings.laneCount;
 
-        // 障害物タイプを選択（ゲーム開始5秒後からground/overhead出現）
+        // 障害物タイプを選択（ゲーム開始0.5秒後からground/overhead出現）
         let type: ObstacleType = 'normal';
-        if (elapsedTotal > 5) {
+        if (elapsedTotal > 0.5) {
             const roll = Math.random();
-            if (elapsedTotal > 10 && roll < 0.15) {
+            if (elapsedTotal > 1.0 && roll < 0.15) {
                 type = 'crawl';
             } else if (roll < 0.35) {
                 type = 'ground';
