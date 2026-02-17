@@ -105,8 +105,9 @@ export class InputManager {
 
     private cameraToLane(inputX: number): number {
         if (settings.laneCount === 3) {
-            if (inputX < -0.33) return 0;
-            if (inputX > 0.33) return 2;
+            // 感度調整: 0.33 -> 0.15 (より少ない移動で反応)
+            if (inputX < -0.15) return 0;
+            if (inputX > 0.15) return 2;
             return 1;
         } else {
             return inputX < 0 ? 0 : 1;

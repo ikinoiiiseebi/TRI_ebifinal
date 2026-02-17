@@ -19,6 +19,7 @@ export class Game {
     private running = false;
     private gameOver = false;
     private lastTime = 0;
+    private animationFrameId: number | null = null;
 
     // スコア・速度
     private score = 0;
@@ -50,12 +51,16 @@ export class Game {
     }
 
     start() {
+        if (this.animationFrameId !== null) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
         this.reset();
         this.running = true;
         this.gameOver = false;
         this.lastTime = performance.now();
         this.phaseManager.start();
-        requestAnimationFrame((t) => this.loop(t));
+        this.loop(this.lastTime);
     }
 
     private reset() {
@@ -84,8 +89,8 @@ export class Game {
         this.update(dt);
         this.draw(dt);
 
-        if (!this.gameOver) {
-            requestAnimationFrame((t) => this.loop(t));
+        if (this.running && !this.gameOver) {
+            this.animationFrameId = requestAnimationFrame((t) => this.loop(t));
         }
     }
 
