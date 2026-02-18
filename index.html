@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>投射呪法訓練場</title>
+  <meta name="description" content="投射呪法の3秒予約→1秒実行サイクルを再現するランゲーム" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"
+    crossorigin="anonymous"></script>
+  <script type="module" crossorigin src="./assets/index-SlPTAvnN.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D3YB89pu.css">
+</head>
+
+<body>
+  <div id="app">
+    <canvas id="gameCanvas"></canvas>
+    <video id="cameraVideo" autoplay playsinline style="display:none;"></video>
+
+    <!-- カメラプレビュー -->
+    <div id="cameraPreview">
+      <video id="previewVideo" autoplay playsinline muted></video>
+      <canvas id="skeletonCanvas"></canvas>
+      <div id="cameraDot"></div>
+    </div>
+
+    <!-- タイトル画面 -->
+    <div id="titleScreen">
+      <!-- 背景要素 -->
+      <div id="leavesContainer"></div>
+
+      <!-- キャラクターと墨 -->
+      <div class="character-container left">
+        <div class="ink-effect"></div>
+        <img src="./images/character/naobito1.png" alt="Naobito" class="character-img" />
+      </div>
+
+      <div class="character-container right">
+        <div class="ink-effect"></div>
+        <img src="./images/character/naoya1.png" alt="Naoya" class="character-img" />
+      </div>
+
+      <!-- タイトルロゴ -->
+      <div class="main-title-container">
+        <img src="./images/character/title_logo.png" alt="投射呪法訓練場" class="title-logo" />
+        <p class="click-to-start">画面をクリックして開始</p>
+      </div>
+    </div>
+
+    <!-- 設定パネル -->
+    <div id="settingsPanel" style="display: none;">
+      <h1 class="game-title">投射呪法訓練場</h1>
+      <div class="settings-group">
+        <label>モード</label>
+        <div class="btn-group">
+          <button class="btn-option active" data-setting="mode" data-value="normal">投射呪法</button>
+          <button class="btn-option" data-setting="mode" data-value="realtime">リアルタイム</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>レーン数</label>
+        <div class="btn-group">
+          <button class="btn-option" data-setting="lanes" data-value="2">2レーン</button>
+          <button class="btn-option active" data-setting="lanes" data-value="3">3レーン</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>予約時間</label>
+        <div class="btn-group">
+          <button class="btn-option active" data-setting="reserveTime" data-value="3">3秒</button>
+          <button class="btn-option" data-setting="reserveTime" data-value="5">5秒</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label>カメラ入力</label>
+        <div class="btn-group">
+          <button class="btn-option" data-setting="camera" data-value="on">有効</button>
+          <button class="btn-option active" data-setting="camera" data-value="off">無効（キーボード）</button>
+        </div>
+      </div>
+
+      <button id="controlsBtn" class="btn-controls">操作方法</button>
+
+      <button id="startBtn" class="btn-start">開始</button>
+      <p class="hint">予約フェーズで行動を入力 → 発動フェーズで自動実行</p>
+    </div>
+
+    <!-- 操作方法モーダル -->
+    <div id="controlsModal" class="modal-overlay" style="display:none;">
+      <div class="modal-content controls-modal-content">
+        <h2 class="modal-title">操作・障害物</h2>
+
+        <div class="controls-grid">
+          <!-- キーボード操作 -->
+          <div class="controls-column">
+            <h3 class="column-title">キーボード操作</h3>
+            <div class="control-text-row">
+              <span class="control-text-key">← →</span>
+              <span class="control-text-desc">レーン移動</span>
+            </div>
+            <div class="control-text-row">
+              <span class="control-text-key">Space / ↑</span>
+              <span class="control-text-desc action-jump">跳ぶ (Jump)</span>
+            </div>
+            <div class="control-text-row">
+              <span class="control-text-key">Shift / ↓</span>
+              <span class="control-text-desc action-crouch">屈む (Crouch)</span>
+            </div>
+            <div class="control-text-row">
+              <span class="control-text-key">Z / C</span>
+              <span class="control-text-desc action-pushup">伏せ (Pushup)</span>
+            </div>
+          </div>
+
+          <!-- カメラ操作 -->
+          <div class="controls-column">
+            <h3 class="column-title">カメラ操作</h3>
+            <div class="control-row">
+              <div class="state-visual state-move">
+                <span class="arrow-left">←</span>
+                <span class="dot-body"></span>
+                <span class="arrow-right">→</span>
+              </div>
+              <span class="control-desc">体を左右に動かす<br><span class="sub-desc">レーン移動</span></span>
+            </div>
+            <div class="control-row">
+              <div class="state-visual state-jump"></div>
+              <span class="control-desc">ジャンプ / 腰を上げる<br><span class="sub-desc">跳ぶ (緑オーラ)</span></span>
+            </div>
+            <div class="control-row">
+              <div class="state-visual state-crouch"></div>
+              <span class="control-desc">しゃがむ / 腰を下げる<br><span class="sub-desc">屈む (青オーラ)</span></span>
+            </div>
+            <div class="control-row">
+              <div class="state-visual state-pushup"></div>
+              <span class="control-desc">深くしゃがむ / 伏せる<br><span class="sub-desc">伏せ (紫オーラ)</span></span>
+            </div>
+          </div>
+
+          <!-- 障害物 -->
+          <div class="controls-column">
+            <h3 class="column-title">障害物と対策</h3>
+            <div class="control-row">
+              <div class="obs-visual obs-wall"><span>壁</span></div>
+              <span class="control-desc">避ける<br><span class="sub-desc">レーン移動</span></span>
+            </div>
+            <div class="control-row">
+              <div class="obs-visual obs-ground"><span>茨</span></div>
+              <span class="control-desc">跳ぶ<br><span class="sub-desc action-jump">Jump</span></span>
+            </div>
+            <div class="control-row">
+              <div class="obs-visual obs-overhead"><span>天</span></div>
+              <span class="control-desc">屈む<br><span class="sub-desc action-crouch">Crouch</span></span>
+            </div>
+            <div class="control-row">
+              <div class="obs-visual obs-crawl"><span>窟</span></div>
+              <span class="control-desc">伏せる<br><span class="sub-desc action-pushup">Pushup</span></span>
+            </div>
+          </div>
+        </div>
+
+        <button id="closeControlsBtn" class="btn-modal-close">閉じる</button>
+      </div>
+    </div>
+
+    <!-- ゲームオーバー -->
+    <div id="gameOverPanel" style="display:none;">
+      <h2 class="gameover-title">終幕</h2>
+      <p class="gameover-score">距離: <span id="finalScore">0</span> m</p>
+      <p class="gameover-best">最高記録: <span id="bestScore">0</span> m</p>
+      <button id="restartBtn" class="btn-start">再開</button>
+      <button id="menuBtn" class="btn-menu">メニューに戻る</button>
+    </div>
+  </div>
+
+</body>
+
+</html>
